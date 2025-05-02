@@ -10,6 +10,7 @@
 #define Kd 0
 
 const uint8_t IR_SENSORS[] = { 5, 6, 7, 8, 9 };  // from left to right
+const int NUM_SENSORS = sizeof(IR_SENSORS) / sizeof(IR_SENSORS[1]);
 
 enum Side {
   LEFT,
