@@ -5,35 +5,35 @@ int I = 0;
 int D = 0;
 
 void setup() {
+  Serial.begin(9600);
+
   setupPins();
 
   setMotor(BOTH, MOTOR_MAX_SPEED);
-  delay(250);
-  setMotor(BOTH, 0);
-  setMotor(BOTH, MOTOR_MAX_SPEED);
-  delay(250);
-  setMotor(BOTH, 0);
-  delay(800);
-}
 
+@@ -19,33 +21,27 @@
 void setupPins() {
   for (int i = 1; i <= 4; i++)
     pinMode(i, OUTPUT);
 
+    
   for (irSensorPin : IR_SENSORS)
     pinMode(irSensorPin, INPUT);
 }
 
 /*
-* negative: drifting left
+* negative: drifting right
 *
 * 0: center
 *
-* positive: drifting right
+* positive: drifting left
 */
 int getError() {
   // TODO: get error of the robot's distance to the center of the line using the 5 ir sensor array
   return 0;
+  int error = 0;
+  bool lineRead = false;
+  
 }
 
 void setMotor(Side side, uint8_t speed, std::optional<Direction> direction) {
