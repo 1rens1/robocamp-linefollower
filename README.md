@@ -4,7 +4,7 @@ Source code and resources for UMN Robocamp 2025: Line follower.
 
 Team: OERO
 
-<img src="linefollower-circuit_bb.png" height="256px" />
+<img src="linefollower-circuit_bb.png" height="256px" style="border: 8px solid white" />
 
 ## Parts used
 
