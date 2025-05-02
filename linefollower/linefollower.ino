@@ -28,9 +28,11 @@ void setupPins() {
 * positive: drifting left
 */
 
-double getError() {
-  int error = 0;
-  bool lineRead = false;
+int getError() {
+  float positionSum = 0.0f;
+  int activeSensorCount = 0;
+  bool lineDetected = false;
+
   const float CENTER_POSITION = (NUM_SENSORS - 1.0f) / 2.0f;
   const int LINE_READING = LOW;
 
@@ -44,15 +46,19 @@ double getError() {
       lineDetected = true;
     }
   }
+
   if (!lineDetected) {
+
     return 0;
+
+  } else {
+    float averagePosition = positionSum / activeSensorCount;
+    int error = static_cast<int>((CENTER_POSITION - averagePosition) * 50.0f);
+
+    return error;
   }
-
-  float averagePosition = positionSum / activeSensorCount;
-  int error = static_cast<int>((averagePosition - CENTER_POSITION) * 50.0f);
-
-  return error;
 }
+
 
 void setMotor(Side side, uint8_t speed, std::optional<Direction> direction) {
   auto set = [&](int dirPin, int pwmPin) {
