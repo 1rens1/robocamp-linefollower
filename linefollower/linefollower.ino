@@ -11,7 +11,6 @@ void setup() {
 
   setMotor(BOTH, MOTOR_MAX_SPEED);
 
-@@ -19,33 +21,27 @@
 void setupPins() {
   for (int i = 1; i <= 4; i++)
     pinMode(i, OUTPUT);
@@ -28,12 +27,31 @@ void setupPins() {
 *
 * positive: drifting left
 */
-int getError() {
-  // TODO: get error of the robot's distance to the center of the line using the 5 ir sensor array
-  return 0;
+
+double getError() {
   int error = 0;
   bool lineRead = false;
-  
+  const float CENTER_POSITION = (NUM_SENSORS - 1.0f) / 2.0f;
+  const int LINE_READING = LOW;
+
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    int pinToRead = IR_SENSORS[i];
+    int sensorValue = digitalRead(pinToRead);
+
+    if (sensorValue == LINE_READING) {
+      positionSum += i;
+      activeSensorCount++;
+      lineDetected = true;
+    }
+  }
+  if (!lineDetected) {
+    return 0;
+  }
+
+  float averagePosition = positionSum / activeSensorCount;
+  int error = static_cast<int>((averagePosition - CENTER_POSITION) * 50.0f);
+
+  return error;
 }
 
 void setMotor(Side side, uint8_t speed, std::optional<Direction> direction) {
