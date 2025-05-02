@@ -25,11 +25,11 @@ void setupPins() {
 }
 
 /*
-* negative: drifting right
+* negative: drifting left
 *
 * 0: center
 *
-* positive: drifting left
+* positive: drifting right
 */
 int getError() {
   // TODO: get error of the robot's distance to the center of the line using the 5 ir sensor array
