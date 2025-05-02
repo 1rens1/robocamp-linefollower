@@ -15,7 +15,7 @@ Team: OERO
 - **Shaft "D" Compatible wheels**
 - **Steel Ball Universal W420**
 - **M3 spacers, screws, and nuts**
-- Custom 3D print parts
+- Custom 3D printed parts
 
 ## License
 
