@@ -4,20 +4,25 @@ int P = 0;
 int I = 0;
 int D = 0;
 
+void setupPins() {
+  pinMode(MOTOR_DIR_LEFT, OUTPUT);
+  pinMode(MOTOR_PWM_LEFT, OUTPUT);
+  pinMode(MOTOR_DIR_RIGHT, OUTPUT);
+  pinMode(MOTOR_PWM_RIGHT, OUTPUT);
+
+  for (int i = 1; i <= 4; i++)
+    pinMode(i, OUTPUT);
+
+  for (irSensorPin : IR_SENSORS)
+    pinMode(irSensorPin, INPUT);  
+}
+
 void setup() {
   Serial.begin(9600);
 
   setupPins();
 
-  setMotor(BOTH, MOTOR_MAX_SPEED);
-
-void setupPins() {
-  for (int i = 1; i <= 4; i++)
-    pinMode(i, OUTPUT);
-
-    
-  for (irSensorPin : IR_SENSORS)
-    pinMode(irSensorPin, INPUT);
+  setMotor(BOTH, MOTOR_MAX_SPEED, Direction::FORWARD);
 }
 
 /*
@@ -59,16 +64,16 @@ int getError() {
   }
 }
 
-
-void setMotor(Side side, uint8_t speed, std::optional<Direction> direction) {
+void setMotor(Side side, int speed, std::optional<Direction> direction) {
   auto set = [&](int dirPin, int pwmPin) {
     if (direction)
       digitalWrite(dirPin, *direction == Direction::FORWARD ? LOW : HIGH);
-    digitalWrite(pwmPin, speed);
+    analogWrite(pwmPin, speed);
   };
   if (side == Side::LEFT || side == Side::BOTH) set(MOTOR_DIR_LEFT, MOTOR_PWM_LEFT);
   if (side == Side::RIGHT || side == Side::BOTH) set(MOTOR_DIR_RIGHT, MOTOR_PWM_RIGHT);
 }
 
 void loop() {
+
 }
