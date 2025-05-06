@@ -1,3 +1,9 @@
+#ifndef HEADERS_H
+#define HEADERS_H
+
+#include <Arduino.h>
+#include <optional>
+
 #define MOTOR_PWM_LEFT 1
 #define MOTOR_PWM_RIGHT 2
 #define MOTOR_DIR_LEFT 3
@@ -5,12 +11,14 @@
 
 #define MOTOR_MAX_SPEED 255  // 0-255
 
-#define Kp 1
-#define Ki 0
-#define Kd 0
+#define Kp 1.0f
+#define Ki 0.0f
+#define Kd 0.0f
+
+const float MAX_INTEGRAL_CONTRIBUTION = 50.0f;
 
 const uint8_t IR_SENSORS[] = { 5, 6, 7, 8, 9 };  // from left to right
-const int NUM_SENSORS = sizeof(IR_SENSORS) / sizeof(IR_SENSORS[1]);
+const int NUM_SENSORS = sizeof(IR_SENSORS) / sizeof(IR_SENSORS[0]);
 
 enum Side {
   LEFT,
@@ -21,4 +29,6 @@ enum Side {
 enum Direction {
   FORWARD,
   BACKWARD
-}
+};
+
+#endif
