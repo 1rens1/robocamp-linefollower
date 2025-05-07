@@ -3,29 +3,25 @@
 long previousError = 0;
 float integralAccumulator = 0.0f;
 
-const int ROBOT_BASE_SPEED = 200;
-
 void setupPins() {
   pinMode(MOTOR_DIR_LEFT, OUTPUT);
   pinMode(MOTOR_PWM_LEFT, OUTPUT);
   pinMode(MOTOR_DIR_RIGHT, OUTPUT);
   pinMode(MOTOR_PWM_RIGHT, OUTPUT);
 
-  for (int i = 1; i <= 4; i++) {
-    pinMode(i, OUTPUT);
-  }
 
-  for (int irSensorPin : IR_SENSORS) {
-    pinMode(irSensorPin, INPUT);
+  for (uint8_t pin : IR_SENSORS) {
+    pinMode(pin, INPUT);
   }
 }
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial);
+  while (!Serial)
+    ;
   setupPins();
 
-  setMotor(BOTH, ROBOT_BASE_SPEED, Direction::FORWARD);
+  setMotor(BOTH, MOTOR_BASE_SPEED, Direction::FORWARD);
   Serial.println("Setup Complete. Loop starting...");
 }
 
@@ -96,12 +92,12 @@ void loop() {
   }
 
   float D_term = Kd * (error - previousError);
-  previousError = error; 
+  previousError = error;
 
   float totalCorrection = P_term + I_term + D_term;
 
-  int leftMotorSpeed = ROBOT_BASE_SPEED - totalCorrection;
-  int rightMotorSpeed = ROBOT_BASE_SPEED + totalCorrection;
+  int leftMotorSpeed = MOTOR_BASE_SPEED - totalCorrection;
+  int rightMotorSpeed = MOTOR_BASE_SPEED + totalCorrection;
 
   leftMotorSpeed = constrain(leftMotorSpeed, 0, MOTOR_MAX_SPEED);
   rightMotorSpeed = constrain(rightMotorSpeed, 0, MOTOR_MAX_SPEED);
@@ -109,13 +105,20 @@ void loop() {
   setMotor(Side::LEFT, leftMotorSpeed, Direction::FORWARD);
   setMotor(Side::RIGHT, rightMotorSpeed, Direction::FORWARD);
 
-  Serial.print("Err: "); Serial.print(error);
-  Serial.print(" P: "); Serial.print(P_term);
-  Serial.print(" I: "); Serial.print(I_term);
-  Serial.print(" D: "); Serial.print(D_term);
-  Serial.print(" Corr: "); Serial.print(totalCorrection);
-  Serial.print(" LSpd: "); Serial.print(leftMotorSpeed);
-  Serial.print(" RSpd: "); Serial.println(rightMotorSpeed);
+  Serial.print("Err: ");
+  Serial.print(error);
+  Serial.print(" P: ");
+  Serial.print(P_term);
+  Serial.print(" I: ");
+  Serial.print(I_term);
+  Serial.print(" D: ");
+  Serial.print(D_term);
+  Serial.print(" Corr: ");
+  Serial.print(totalCorrection);
+  Serial.print(" LSpd: ");
+  Serial.print(leftMotorSpeed);
+  Serial.print(" RSpd: ");
+  Serial.println(rightMotorSpeed);
 
   delay(10);
 }
