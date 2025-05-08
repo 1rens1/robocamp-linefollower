@@ -21,8 +21,20 @@ void setup() {
     ;
   setupPins();
 
-  setMotor(BOTH, MOTOR_BASE_SPEED, Direction::FORWARD);
+  setupAnimation();
+
   Serial.println("Setup Complete. Loop starting...");
+}
+
+void setupAnimation() {
+  setMotor(BOTH, MOTOR_BASE_SPEED);
+  delay(200);
+  setMotor(BOTH, 0);
+  delay(200);
+  setMotor(BOTH, MOTOR_BASE_SPEED);
+  delay(200);
+  setMotor(BOTH, 0);
+  delay(1500);
 }
 
 /*
@@ -59,20 +71,19 @@ int getError() {
   }
 }
 
-void setMotor(Side side, int speed, std::optional<Direction> directionOpt) {
+void setMotor(Side side, int speed, Direction direction) {
   speed = constrain(speed, 0, MOTOR_MAX_SPEED);
+  int ctrl = direction == Direction::FORWARD ? LOW : HIGH;
 
-  auto setSingleMotor = [&](int dirPin, int pwmPin) {
-    if (directionOpt) {
-      digitalWrite(dirPin, (*directionOpt == Direction::FORWARD ? LOW : HIGH));
-    }
+  auto setSingleMotor = [&](int pwmPin, int dirPin) {
+    digitalWrite(dirPin, ctrl);
     analogWrite(pwmPin, speed);
   };
 
-  if (side == Side::LEFT || side == Side::BOTH) {
+  if (side == LEFT || side == BOTH) {
     setSingleMotor(MOTOR_DIR_LEFT, MOTOR_PWM_LEFT);
   }
-  if (side == Side::RIGHT || side == Side::BOTH) {
+  if (side == RIGHT || side == BOTH) {
     setSingleMotor(MOTOR_DIR_RIGHT, MOTOR_PWM_RIGHT);
   }
 }
