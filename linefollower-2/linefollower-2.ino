@@ -2,6 +2,7 @@
 
 long previousError = 0;
 float integralAccumulator = 0.0f;
+unsigned long last_time = 0;
 
 void setupPins() {
   pinMode(MOTOR_DIR_LEFT, OUTPUT);
@@ -38,6 +39,7 @@ void setup() {
   Serial.println("Setup Complete. Loop starting...");
 }
 
+int lastError = 0;
 
 /*
 * getError() function:
@@ -46,7 +48,23 @@ void setup() {
 * positive error: drifting left (line is to the robot's left, robot needs to turn left)
 */
 int getError() {
-  return 0;
+  uint8_t active = 0;
+  int error = 0;
+
+  for (uint8_t i = 0; i < IR_SENSORS_COUNT; i++) {
+    if (digitalRead(IR_SENSORS[i]) == ON_LINE) {
+      error += IR_SENSORS_WEIGHTS[i];
+      active++;
+    }
+  }
+
+  if (active == 0) {
+    return lastError;
+  }
+
+  lastError = error;
+
+  return error;
 }
 
 void bangBang() {
@@ -69,13 +87,36 @@ void bangBang() {
 }
 
 
+// PID Algorithm
 void loop() {
-  // int error = getError();
+  int error = getError();
+  unsigned long now = millis();
 
-  bangBang();
+  // bangBang();
 
+  int dt = (now - last_time) / 1000;
 
+  int p = Kp * error;
+  int i = dt * error;
+  int d = Kd * 0;
 
+  int correction = p + i + d;
+  int derivative = (error - previousError) / dt;
 
-  // delay(10);
+  int leftSpeed = MOTOR_BASE_SPEED + correction;
+  int rightSpeed = MOTOR_BASE_SPEED - correction;
+
+  if (leftSpeed >= 0) setMotor(LEFT, leftSpeed, FORWARD);
+  else setMotor(LEFT, abs(leftSpeed), BACKWARD);
+
+  if (rightSpeed >= 0) setMotor(RIGHT, rightSpeed, FORWARD);
+  else setMotor(RIGHT, abs(rightSpeed), BACKWARD);
+
+  Serial.print(leftSpeed);
+  Serial.print(" ");
+  Serial.println(rightSpeed);
+
+  last_time = now;
+
+  delay(10);
 }
