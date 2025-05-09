@@ -15,6 +15,17 @@ void setupPins() {
   }
 }
 
+void setupAnimation() {
+  setMotor(BOTH, 100, FORWARD);
+  delay(200);
+  setMotor(BOTH, 0, FORWARD);
+  delay(300);
+  setMotor(BOTH, 100, BACKWARD);
+  delay(200);
+  setMotor(BOTH, 0, FORWARD);
+  delay(1500);
+}
+
 void setup() {
   delay(800);
   Serial.begin(9600);
@@ -25,19 +36,8 @@ void setup() {
   setupAnimation();
 
   Serial.println("Setup Complete. Loop starting...");
-
 }
 
-void setupAnimation() {
-  setMotor(BOTH, MOTOR_BASE_SPEED, FORWARD);
-  delay(200);
-  setMotor(BOTH, 0, FORWARD);
-  delay(200);
-  setMotor(BOTH, MOTOR_BASE_SPEED, BACKWARD);
-  delay(200);
-  setMotor(BOTH, 0, FORWARD);
-  delay(1500);
-}
 
 /*
 * getError() function:
@@ -49,27 +49,33 @@ int getError() {
   return 0;
 }
 
-void setMotor(Side side, int speed, Direction direction) {
-  speed = constrain(speed, 0, MOTOR_MAX_SPEED);
-  int ctrl = direction == Direction::FORWARD ? HIGH : LOW;
-
-  auto setSingleMotor = [&](int pwmPin, int dirPin) {
-    digitalWrite(dirPin, ctrl);
-    analogWrite(pwmPin, speed);
-  };
-
-  if (side == LEFT || side == BOTH) {
-    setSingleMotor(MOTOR_PWM_LEFT, MOTOR_DIR_LEFT);
+void bangBang() {
+  uint8_t sensorValues[IR_SENSORS_COUNT];
+  for (int i = 0; i < IR_SENSORS_COUNT; i++) {
+    sensorValues[i] = digitalRead(IR_SENSORS[i]);
   }
-  if (side == RIGHT || side == BOTH) {
-    setSingleMotor(MOTOR_PWM_RIGHT, MOTOR_DIR_RIGHT);
+
+  if (sensorValues[1] == ON_LINE && sensorValues[3] == OFF_LINE) {  // drifting right
+    Serial.println("drift right, go left");
+    setMotor(LEFT, 0, FORWARD);
+    setMotor(RIGHT, MOTOR_BASE_SPEED, FORWARD);
+  } else if (sensorValues[1] == OFF_LINE && sensorValues[3] == ON_LINE) {  // drifting left
+    Serial.println("drift left, go right");
+    setMotor(LEFT, MOTOR_BASE_SPEED, FORWARD);
+    setMotor(RIGHT, 0, FORWARD);
+  } else {
+    setMotor(BOTH, MOTOR_BASE_SPEED, FORWARD);
   }
 }
 
+
 void loop() {
-  int error = getError();
+  // int error = getError();
 
-  
+  bangBang();
 
-  delay(10);
+
+
+
+  // delay(10);
 }
