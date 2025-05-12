@@ -11,11 +11,9 @@
 #define MOTOR_BASE_SPEED 150  // 0-255
 #define MOTOR_MAX_SPEED 255  // 0-255
 
-#define Kp 0.7f * MOTOR_BASE_SPEED
-#define Ki 0.6f
-#define Kd 0.3f
-
-const float MAX_INTEGRAL_CONTRIBUTION = 50.0f;
+#define Kp 0.6f * MOTOR_BASE_SPEED
+#define Ki 0.0f
+#define Kd 6.0f
 
 const uint8_t IR_SENSORS[] = { D5, D6, D0, D7, D8 };  // from left to right
 const uint8_t IR_SENSORS_COUNT = 5;
@@ -39,7 +37,7 @@ enum Direction {
 
 
 void setMotor(Side side, int speed, Direction direction) {
-  speed = constrain(speed, 0, MOTOR_MAX_SPEED);
+  speed = constrain(side == LEFT ? speed * 0.95f : speed, 0, MOTOR_MAX_SPEED);
   int ctrl = direction == Direction::FORWARD ? HIGH : LOW;
 
   auto setSingleMotor = [&](int pwmPin, int dirPin) {
