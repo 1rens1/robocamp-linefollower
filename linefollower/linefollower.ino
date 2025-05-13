@@ -2,6 +2,7 @@
 
 long previousError = 0;
 float integralAccumulator = 0.0f;
+unsigned long last_time = 0;
 
 void setupPins() {
   pinMode(MOTOR_DIR_LEFT, OUTPUT);
@@ -15,7 +16,19 @@ void setupPins() {
   }
 }
 
+void setupAnimation() {
+  setMotor(BOTH, 100, FORWARD);
+  delay(200);
+  setMotor(BOTH, 0, FORWARD);
+  delay(300);
+  setMotor(BOTH, 100, BACKWARD);
+  delay(200);
+  setMotor(BOTH, 0, FORWARD);
+  delay(1500);
+}
+
 void setup() {
+  delay(800);
   Serial.begin(9600);
   while (!Serial)
     ;
@@ -26,16 +39,7 @@ void setup() {
   Serial.println("Setup Complete. Loop starting...");
 }
 
-void setupAnimation() {
-  setMotor(BOTH, MOTOR_BASE_SPEED);
-  delay(200);
-  setMotor(BOTH, 0);
-  delay(200);
-  setMotor(BOTH, MOTOR_BASE_SPEED);
-  delay(200);
-  setMotor(BOTH, 0);
-  delay(1500);
-}
+int lastError = 0;
 
 /*
 * getError() function:
@@ -44,92 +48,75 @@ void setupAnimation() {
 * positive error: drifting left (line is to the robot's left, robot needs to turn left)
 */
 int getError() {
-  float positionSum = 0.0f;
-  int activeSensorCount = 0;
-  bool lineDetected = false;
+  uint8_t active = 0;
+  int error = 0;
 
-  const float CENTER_POSITION = (NUM_SENSORS - 1.0f) / 2.0f;
-  const int LINE_READING = LOW;
-
-  for (int i = 0; i < NUM_SENSORS; i++) {
-    int pinToRead = IR_SENSORS[i];
-    int sensorValue = digitalRead(pinToRead);
-
-    if (sensorValue == LINE_READING) {
-      positionSum += i;
-      activeSensorCount++;
-      lineDetected = true;
+  for (uint8_t i = 0; i < IR_SENSORS_COUNT; i++) {
+    if (digitalRead(IR_SENSORS[i]) == ON_LINE) {
+      error += IR_SENSORS_WEIGHTS[i];
+      active++;
     }
   }
 
-  if (!lineDetected) {
-    return 0;
-  } else {
-    float averagePosition = positionSum / activeSensorCount;
-    int error = static_cast<int>((CENTER_POSITION - averagePosition) * 50.0f);
-    return error;
+  if (active == 0) {
+    return lastError;
   }
+
+  lastError = error;
+
+  return error;
 }
 
-void setMotor(Side side, int speed, Direction direction) {
-  speed = constrain(speed, 0, MOTOR_MAX_SPEED);
-  int ctrl = direction == Direction::FORWARD ? LOW : HIGH;
+// void bangBang() {
+//   uint8_t sensorValues[IR_SENSORS_COUNT];
+//   for (int i = 0; i < IR_SENSORS_COUNT; i++) {
+//     sensorValues[i] = digitalRead(IR_SENSORS[i]);
+//   }
 
-  auto setSingleMotor = [&](int pwmPin, int dirPin) {
-    digitalWrite(dirPin, ctrl);
-    analogWrite(pwmPin, speed);
-  };
+//   if (sensorValues[1] == ON_LINE && sensorValues[3] == OFF_LINE) {  // drifting right
+//     Serial.println("drift right, go left");
+//     setMotor(LEFT, 0, FORWARD);
+//     setMotor(RIGHT, MOTOR_BASE_SPEED, FORWARD);
+//   } else if (sensorValues[1] == OFF_LINE && sensorValues[3] == ON_LINE) {  // drifting left
+//     Serial.println("drift left, go right");
+//     setMotor(LEFT, MOTOR_BASE_SPEED, FORWARD);
+//     setMotor(RIGHT, 0, FORWARD);
+//   } else {
+//     setMotor(BOTH, MOTOR_BASE_SPEED , FORWARD);
+//   }
+// }
 
-  if (side == LEFT || side == BOTH) {
-    setSingleMotor(MOTOR_DIR_LEFT, MOTOR_PWM_LEFT);
-  }
-  if (side == RIGHT || side == BOTH) {
-    setSingleMotor(MOTOR_DIR_RIGHT, MOTOR_PWM_RIGHT);
-  }
-}
+int p = 0;
+int i = 0;
+int d = 0;
 
+// PID Algorithm
 void loop() {
   int error = getError();
+  unsigned long now = millis();
 
-  float P_term = Kp * error;
+  // bangBang();
 
-  integralAccumulator += error;
-  float I_term = Ki * integralAccumulator;
-  I_term = constrain(I_term, -MAX_INTEGRAL_CONTRIBUTION, MAX_INTEGRAL_CONTRIBUTION);
-  if (Ki != 0.0f) {
-    integralAccumulator = I_term / Ki;
-  } else {
-    integralAccumulator = 0.0f;
-  }
+  p = Kp * error;
+  i = constrain(Ki * (i + error), float(MOTOR_MAX_SPEED * -1), float(MOTOR_MAX_SPEED));
+  d = Kd * error - lastError;
 
-  float D_term = Kd * (error - previousError);
-  previousError = error;
+  int correction = ( p) + ( i) + ( d);
 
-  float totalCorrection = P_term + I_term + D_term;
+  int leftSpeed = MOTOR_BASE_SPEED + correction;
+  int rightSpeed = MOTOR_BASE_SPEED - correction;
 
-  int leftMotorSpeed = MOTOR_BASE_SPEED - totalCorrection;
-  int rightMotorSpeed = MOTOR_BASE_SPEED + totalCorrection;
+  if (leftSpeed >= 0) setMotor(LEFT, leftSpeed, FORWARD);
+  else setMotor(LEFT, abs(leftSpeed), BACKWARD);
 
-  leftMotorSpeed = constrain(leftMotorSpeed, 0, MOTOR_MAX_SPEED);
-  rightMotorSpeed = constrain(rightMotorSpeed, 0, MOTOR_MAX_SPEED);
+  if (rightSpeed >= 0) setMotor(RIGHT, rightSpeed, FORWARD);
+  else setMotor(RIGHT, abs(rightSpeed), BACKWARD);
 
-  setMotor(Side::LEFT, leftMotorSpeed, Direction::FORWARD);
-  setMotor(Side::RIGHT, rightMotorSpeed, Direction::FORWARD);
+  Serial.print(leftSpeed);
+  Serial.print(" ");
+  Serial.println(rightSpeed);
 
-  Serial.print("Err: ");
-  Serial.print(error);
-  Serial.print(" P: ");
-  Serial.print(P_term);
-  Serial.print(" I: ");
-  Serial.print(I_term);
-  Serial.print(" D: ");
-  Serial.print(D_term);
-  Serial.print(" Corr: ");
-  Serial.print(totalCorrection);
-  Serial.print(" LSpd: ");
-  Serial.print(leftMotorSpeed);
-  Serial.print(" RSpd: ");
-  Serial.println(rightMotorSpeed);
+  last_time = now;
 
-  delay(10);
+  // delay(10);
 }
