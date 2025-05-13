@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "headers2.h"
 
 long previousError = 0;
 float integralAccumulator = 0.0f;
@@ -67,25 +67,28 @@ int getError() {
   return error;
 }
 
-void bangBang() {
-  uint8_t sensorValues[IR_SENSORS_COUNT];
-  for (int i = 0; i < IR_SENSORS_COUNT; i++) {
-    sensorValues[i] = digitalRead(IR_SENSORS[i]);
-  }
+// void bangBang() {
+//   uint8_t sensorValues[IR_SENSORS_COUNT];
+//   for (int i = 0; i < IR_SENSORS_COUNT; i++) {
+//     sensorValues[i] = digitalRead(IR_SENSORS[i]);
+//   }
 
-  if (sensorValues[1] == ON_LINE && sensorValues[3] == OFF_LINE) {  // drifting right
-    Serial.println("drift right, go left");
-    setMotor(LEFT, 0, FORWARD);
-    setMotor(RIGHT, MOTOR_BASE_SPEED, FORWARD);
-  } else if (sensorValues[1] == OFF_LINE && sensorValues[3] == ON_LINE) {  // drifting left
-    Serial.println("drift left, go right");
-    setMotor(LEFT, MOTOR_BASE_SPEED, FORWARD);
-    setMotor(RIGHT, 0, FORWARD);
-  } else {
-    setMotor(BOTH, MOTOR_BASE_SPEED, FORWARD);
-  }
-}
+//   if (sensorValues[1] == ON_LINE && sensorValues[3] == OFF_LINE) {  // drifting right
+//     Serial.println("drift right, go left");
+//     setMotor(LEFT, 0, FORWARD);
+//     setMotor(RIGHT, MOTOR_BASE_SPEED, FORWARD);
+//   } else if (sensorValues[1] == OFF_LINE && sensorValues[3] == ON_LINE) {  // drifting left
+//     Serial.println("drift left, go right");
+//     setMotor(LEFT, MOTOR_BASE_SPEED, FORWARD);
+//     setMotor(RIGHT, 0, FORWARD);
+//   } else {
+//     setMotor(BOTH, MOTOR_BASE_SPEED , FORWARD);
+//   }
+// }
 
+int p = 0;
+int i = 0;
+int d = 0;
 
 // PID Algorithm
 void loop() {
@@ -94,14 +97,11 @@ void loop() {
 
   // bangBang();
 
-  int dt = (now - last_time) / 1000;
+  p = Kp * error;
+  i = constrain(Ki * (i + error), float(MOTOR_MAX_SPEED * -1), float(MOTOR_MAX_SPEED));
+  d = Kd * error - lastError;
 
-  int p = Kp * error;
-  int i = dt * error;
-  int d = Kd * 0;
-
-  int correction = p + i + d;
-  int derivative = (error - previousError) / dt;
+  int correction = ( p) + ( i) + ( d);
 
   int leftSpeed = MOTOR_BASE_SPEED + correction;
   int rightSpeed = MOTOR_BASE_SPEED - correction;
@@ -118,5 +118,5 @@ void loop() {
 
   last_time = now;
 
-  delay(10);
+  // delay(10);
 }
