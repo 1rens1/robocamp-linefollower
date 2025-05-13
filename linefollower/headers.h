@@ -11,13 +11,13 @@
 #define MOTOR_BASE_SPEED 110  // 0-255
 #define MOTOR_MAX_SPEED 255  // 0-255
 
-#define Kp 1.0f * MOTOR_BASE_SPEED
-#define Ki 0.0f
-#define Kd 11.5f
+#define Kp 0.8f * MOTOR_BASE_SPEED
+#define Ki 0.005f
+#define Kd 3.0f
 
 const uint8_t IR_SENSORS[] = { D5, D6, D0, D7, D8 };  // from left to right
 const uint8_t IR_SENSORS_COUNT = 5;
-const float IR_SENSORS_WEIGHTS[IR_SENSORS_COUNT] = { -4.0f, -1.0f, 0.0f, 1.0f, 4.0f };
+const float IR_SENSORS_WEIGHTS[IR_SENSORS_COUNT] = { -3.0f, -1.0f, 0.0f, 1.0f, 3.0f };
 
 
 #define ON_LINE LOW
