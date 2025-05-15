@@ -29,14 +29,7 @@ void setupAnimation() {
 void setup() {
   delay(800);
   Serial.begin(9600);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-  while (!Serial); // Optional: wait for Serial
->>>>>>> Stashed changes
-=======
-  while (!Serial); // Optional: wait for Serial
->>>>>>> Stashed changes
+  while (!Serial); 
 
   setupPins();
   setupAnimation();
@@ -53,18 +46,12 @@ float lastError = 0.0f;
  * positive error: drifting left (line is to the robot's left)
  */
 float getError() {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
   if (digitalRead(IR_SENSORS[0]) == ON_LINE) return -100.0f;
   if (digitalRead(IR_SENSORS[IR_SENSORS_COUNT - 1]) == ON_LINE) return 100.0f;  // ✅ fixed parenthesis
 
->>>>>>> Stashed changes
-=======
   if (digitalRead(IR_SENSORS[0]) == ON_LINE) return -100.0f;
-  if (digitalRead(IR_SENSORS[IR_SENSORS_COUNT - 1]) == ON_LINE) return 100.0f;  // ✅ fixed parenthesis
+  if (digitalRead(IR_SENSORS[IR_SENSORS_COUNT - 1]) == ON_LINE) return 100.0f; 
 
->>>>>>> Stashed changes
   uint8_t active = 0;
   float error = 0.0f;
 
@@ -72,19 +59,10 @@ float getError() {
     if (digitalRead(IR_SENSORS[i]) == ON_LINE) {
       float weight = IR_SENSORS_WEIGHTS[i];
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
       if (i == 0 || i == IR_SENSORS_COUNT - 1) {
-        weight *= 1.8f;  // amplify edge sensors
+        weight *= 1.8f; 
       }
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
       error += weight;
       active++;
     }
@@ -102,9 +80,6 @@ float getError() {
 float p = 0.0f;
 float i = 0.0f;
 float d = 0.0f;
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 //  THIS IS LINEFOLLOWER.INO NOT LINEFOLLOWER2.INO
 //  THIS IS LINEFOLLOWER.INO NOT LINEFOLLOWER2.INO
 //  THIS IS LINEFOLLOWER.INO NOT LINEFOLLOWER2.INO
@@ -119,20 +94,7 @@ void loop() {
   unsigned long now = millis();
   Serial.println(error);
 
-=======
-void loop() {
-  float error = getError();
-  unsigned long now = millis();
-
   // === PID Calculation ===
->>>>>>> Stashed changes
-=======
-void loop() {
-  float error = getError();
-  unsigned long now = millis();
-
-  // === PID Calculation ===
->>>>>>> Stashed changes
   p = Kp * error;
   i = constrain(integralAccumulator + (Ki * error), -MOTOR_MAX_SPEED, MOTOR_MAX_SPEED);
   d = Kd * (error - previousError);
