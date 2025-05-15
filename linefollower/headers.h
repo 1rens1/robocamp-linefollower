@@ -11,9 +11,15 @@
 #define MOTOR_BASE_SPEED 110  // 0-255
 #define MOTOR_MAX_SPEED 255  // 0-255
 
+<<<<<<< Updated upstream
 #define Kp 0.8f * MOTOR_BASE_SPEED
 #define Ki 0.005f
 #define Kd 3.0f
+=======
+#define Kp 1.2f * MOTOR_BASE_SPEED
+#define Ki 0.0f
+#define Kd 13.0f
+>>>>>>> Stashed changes
 
 const uint8_t IR_SENSORS[] = { D5, D6, D0, D7, D8 };  // from left to right
 const uint8_t IR_SENSORS_COUNT = 5;

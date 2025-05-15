@@ -88,6 +88,9 @@ void loop() {
   setMotor(LEFT, abs(leftSpeed), leftSpeed >= 0 ? FORWARD : BACKWARD);
   setMotor(RIGHT, abs(rightSpeed), rightSpeed >= 0 ? FORWARD : BACKWARD);
 
+  Serial.print("Correction: ");
+  Serial.print(correction);
+  Serial.print(" | ")
   Serial.print(leftSpeed);
   Serial.print(" ");
   Serial.println(rightSpeed);
