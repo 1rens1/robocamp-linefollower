@@ -30,6 +30,10 @@ void setup() {
   delay(800);
   Serial.begin(9600);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+  while (!Serial); // Optional: wait for Serial
+>>>>>>> Stashed changes
 =======
   while (!Serial); // Optional: wait for Serial
 >>>>>>> Stashed changes
@@ -50,6 +54,12 @@ float lastError = 0.0f;
  */
 float getError() {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+  if (digitalRead(IR_SENSORS[0]) == ON_LINE) return -100.0f;
+  if (digitalRead(IR_SENSORS[IR_SENSORS_COUNT - 1]) == ON_LINE) return 100.0f;  // ✅ fixed parenthesis
+
+>>>>>>> Stashed changes
 =======
   if (digitalRead(IR_SENSORS[0]) == ON_LINE) return -100.0f;
   if (digitalRead(IR_SENSORS[IR_SENSORS_COUNT - 1]) == ON_LINE) return 100.0f;  // ✅ fixed parenthesis
@@ -63,11 +73,17 @@ float getError() {
       float weight = IR_SENSORS_WEIGHTS[i];
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
       if (i == 0 || i == IR_SENSORS_COUNT - 1) {
         weight *= 1.8f;  // amplify edge sensors
       }
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       error += weight;
       active++;
@@ -88,6 +104,7 @@ float i = 0.0f;
 float d = 0.0f;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //  THIS IS LINEFOLLOWER.INO NOT LINEFOLLOWER2.INO
 //  THIS IS LINEFOLLOWER.INO NOT LINEFOLLOWER2.INO
 //  THIS IS LINEFOLLOWER.INO NOT LINEFOLLOWER2.INO
@@ -102,6 +119,13 @@ void loop() {
   unsigned long now = millis();
   Serial.println(error);
 
+=======
+void loop() {
+  float error = getError();
+  unsigned long now = millis();
+
+  // === PID Calculation ===
+>>>>>>> Stashed changes
 =======
 void loop() {
   float error = getError();

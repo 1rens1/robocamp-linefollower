@@ -12,9 +12,15 @@
 #define MOTOR_MAX_SPEED 255  // 0-255
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 #define Kp 0.8f * MOTOR_BASE_SPEED
 #define Ki 0.005f
 #define Kd 3.0f
+=======
+#define Kp 1.2f * MOTOR_BASE_SPEED
+#define Ki 0.0f
+#define Kd 13.0f
+>>>>>>> Stashed changes
 =======
 #define Kp 1.2f * MOTOR_BASE_SPEED
 #define Ki 0.0f
