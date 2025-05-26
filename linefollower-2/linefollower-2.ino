@@ -28,14 +28,14 @@ void setupAnimation() {
 
 void setup() {
   delay(800);
-  Serial.begin(9600);
-  while (!Serial)
-    ;
+  // Serial.begin(9600);
+  // while (!Serial)
+  //   ;
   setupPins();
 
   setupAnimation();
 
-  Serial.println("Setup Complete. Loop starting...");
+  // Serial.println("Setup Complete. Loop starting...");
 }
 
 float lastError = 0;
@@ -56,6 +56,7 @@ float getError() {
       active++;
     }
   }
+  error = constrain(error, IR_SENSORS_WEIGHTS[0], IR_SENSORS_WEIGHTS[IR_SENSORS_COUNT - 1]);
 
   if (active == 0)
     return lastError;
@@ -74,8 +75,6 @@ void loop() {
   float error = getError();
   unsigned long now = millis();
 
-  // bangBang();
-
   p = Kp * error;
   i = constrain(Ki * (i + error), INTEGRAL_MAX_CONTRIBUTION * -1, INTEGRAL_MAX_CONTRIBUTION);
   d = Kd * error - lastError;
@@ -88,14 +87,14 @@ void loop() {
   setMotor(LEFT, abs(leftSpeed), leftSpeed >= 0 ? FORWARD : BACKWARD);
   setMotor(RIGHT, abs(rightSpeed), rightSpeed >= 0 ? FORWARD : BACKWARD);
 
-  Serial.print("Correction: ");
-  Serial.print(correction);
-  Serial.print(" | ")
-  Serial.print(leftSpeed);
-  Serial.print(" ");
-  Serial.println(rightSpeed);
+  // Serial.print("Correction: ");
+  // Serial.print(correction);
+  // Serial.print(" | ");
+  // Serial.print(leftSpeed);
+  // Serial.print(" ");
+  // Serial.println(rightSpeed);
 
   lastTime = now;
 
-  // delay(10);
+  // delay(5);
 }

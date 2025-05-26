@@ -9,17 +9,17 @@
 #define MOTOR_DIR_RIGHT D4
 
 #define MOTOR_BASE_SPEED 150  // 0-255
-#define MOTOR_MAX_SPEED 255  // 0-255
+#define MOTOR_MAX_SPEED 255   // 0-255
 
 #define INTEGRAL_MAX_CONTRIBUTION 255.0f
 
-#define Kp 1.0f * MOTOR_BASE_SPEED
-#define Ki 0.05f
-#define Kd 10.0f
+#define Kp 0.7f * MOTOR_BASE_SPEED
+#define Ki 0.0f
+#define Kd 7.0f
 
 const uint8_t IR_SENSORS[] = { D5, D6, D0, D7, D8 };  // from left to right
 const uint8_t IR_SENSORS_COUNT = 5;
-const float IR_SENSORS_WEIGHTS[IR_SENSORS_COUNT] = { -2.5f, -1.0f, 0.0f, 1.0f, 2.5f };
+const float IR_SENSORS_WEIGHTS[IR_SENSORS_COUNT] = { -2.9f, -1.1f, 0.0f, 1.1f, 2.9f };
 
 
 #define ON_LINE LOW
@@ -39,7 +39,7 @@ enum Direction {
 
 
 void setMotor(Side side, int speed, Direction direction) {
-  speed = constrain(side == LEFT ? speed * 0.95f : speed, 0, MOTOR_MAX_SPEED);
+  speed = constrain(side == RIGHT ? speed * 0.9f : speed, 0, MOTOR_MAX_SPEED);
   int ctrl = direction == Direction::FORWARD ? HIGH : LOW;
 
   auto setSingleMotor = [&](int pwmPin, int dirPin) {
@@ -47,12 +47,8 @@ void setMotor(Side side, int speed, Direction direction) {
     analogWrite(pwmPin, speed);
   };
 
-  if (side == LEFT || side == BOTH) {
-    setSingleMotor(MOTOR_PWM_LEFT, MOTOR_DIR_LEFT);
-  }
-  if (side == RIGHT || side == BOTH) {
-    setSingleMotor(MOTOR_PWM_RIGHT, MOTOR_DIR_RIGHT);
-  }
+  if (side == LEFT || side == BOTH) setSingleMotor(MOTOR_PWM_LEFT, MOTOR_DIR_LEFT);
+  if (side == RIGHT || side == BOTH) setSingleMotor(MOTOR_PWM_RIGHT, MOTOR_DIR_RIGHT);
 }
 
 #endif
